@@ -635,4 +635,3 @@ Level 4: AI fully autonomous (rare today)
 
 ---
 
-*Built with Claude Code*
