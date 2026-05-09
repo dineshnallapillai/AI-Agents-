@@ -7,9 +7,11 @@
 
 ### "What if AI didn't just answer your questions... but actually did the work?"
 
-| 2022 | 2024 | 2025+ |
-|------|------|-------|
+| 2022 | 2023-2024 | 2025+ |
+|------|-----------|-------|
 | "Write me an email" | "Draft and send the email" | "Manage my inbox, prioritize, draft responses, schedule follow-ups" |
+| You copy-paste and send | AI executes via tools/APIs | AI runs autonomously, ongoing |
+| **Text Generator** | **Task Executor** | **Autonomous Workflow Manager** |
 
 We crossed the line from **AI as a tool you use** to **AI as a worker you delegate to**.
 
@@ -23,17 +25,17 @@ We crossed the line from **AI as a tool you use** to **AI as a worker you delega
 2022          2023              2024              2025
  |              |                 |                 |
  v              v                 v                 v
-CHATBOTS     COPILOTS         AGENTS          MULTI-AGENT
-                                                SYSTEMS
-"Answer my    "Help me         "Do it           "Coordinate
- question"     while I work"    for me"          with each other"
+CHATBOTS     COPILOTS &       AUTONOMOUS       PRODUCTION
+             FIRST AGENTS      AGENTS           MULTI-AGENT
+"Answer my    "Help me /       "Do it           "Coordinate
+ question"     let me try"      for me"          at scale"
 ```
 
 **Key milestones:**
 - **2022:** ChatGPT launches — world meets conversational AI
-- **2023:** GitHub Copilot, coding assistants — AI as a pair programmer
-- **2024:** Claude Code, Devin, AutoGPT — AI takes autonomous actions
-- **2025:** Multi-agent systems, MCP protocol — agents collaborate at scale
+- **2023:** GPT-4, AutoGPT, GitHub Copilot Chat — first agent experiments and AI pair programming
+- **2024:** Devin, Cursor, MCP protocol (Nov 2024) — autonomous coding agents and tool standards emerge
+- **2025:** Claude Code, multi-agent systems — agents go production-scale
 
 > This isn't a decade-long trend. It's 3 years from "party trick" to "production system."
 
