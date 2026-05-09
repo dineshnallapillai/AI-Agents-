@@ -156,6 +156,11 @@ User --> Agent (with tools) --> Result
 ```
 *Best for:* Focused tasks — code fix, data analysis, writing
 
+*Examples:*
+- **Claude Code** fixing a bug: reads error -> finds file -> edits code -> runs tests -> done
+- **Data analyst agent**: takes a CSV, cleans it, runs analysis, produces a summary report
+- **Email drafter**: given context, writes a professional response matching your tone
+
 ---
 
 **Pattern 2: Multi-Agent (Hub & Spoke)**
@@ -167,6 +172,11 @@ User --> Orchestrator --> Research Agent
 ```
 *Best for:* Complex tasks requiring different expertise
 
+*Examples:*
+- **Software feature delivery**: Orchestrator delegates — one agent writes code, another writes tests, a third reviews for security, final agent creates the PR
+- **Market research report**: Research agent gathers data, analysis agent finds trends, writing agent produces the report, fact-check agent verifies claims
+- **Incident response**: Triage agent reads alerts, diagnosis agent checks logs, fix agent applies remediation, comms agent updates the status page
+
 ---
 
 **Pattern 3: Pipeline (Sequential)**
@@ -176,6 +186,11 @@ Input --> Agent A --> Agent B --> Agent C --> Output
 ```
 *Best for:* Content creation, document processing
 
+*Examples:*
+- **Blog post pipeline**: Agent A drafts content -> Agent B edits for clarity and tone -> Agent C optimizes for SEO and formatting
+- **Invoice processing**: Agent A extracts data from PDF -> Agent B validates against purchase orders -> Agent C posts to accounting system
+- **Code migration**: Agent A converts syntax (Python 2 -> 3) -> Agent B fixes broken tests -> Agent C updates documentation
+
 ---
 
 **Pattern 4: Human-in-the-Loop**
@@ -183,6 +198,12 @@ Input --> Agent A --> Agent B --> Agent C --> Output
 Agent works --> [Checkpoint] --> Human approves --> Agent continues
 ```
 *Best for:* High-stakes decisions (deployments, financial, legal)
+
+*Examples:*
+- **Production deployment**: Agent prepares release, runs staging tests, generates changelog — *pauses for human approval* — then deploys
+- **Legal contract review**: Agent flags risky clauses, suggests edits, drafts counter-proposals — *lawyer reviews and approves* — agent sends final version
+- **Financial trading**: Agent identifies opportunity, models risk, prepares order — *trader confirms* — agent executes trade
+- **Medical triage**: Agent analyzes symptoms, suggests diagnosis, recommends treatment plan — *doctor reviews* — agent schedules follow-up
 
 > Most production systems use Pattern 4. Full autonomy is rare for anything important. The best agents know *when to ask*.
 
