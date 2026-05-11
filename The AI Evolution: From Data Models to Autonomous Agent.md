@@ -512,39 +512,72 @@ But to understand LLMs, we need to understand what came before them.
 
 A neural network is inspired by how the human brain works — layers of connected "neurons" that pass signals to each other.
 
+**Imagine you're deciding whether a photo is a cat or a dog.** Your brain doesn't look at the whole image at once — it notices individual clues: pointy ears? probably cat. Long snout? probably dog. A neural network does the same thing, but with numbers.
+
 ```
-THE SIMPLEST NEURAL NETWORK
+THE PROCESS:
 
-  INPUT LAYER          HIDDEN LAYER          OUTPUT LAYER
-  (what you feed in)   (where learning       (the answer)
-                        happens)
+1. INPUT LAYER (the raw data comes in)
+   - The image is broken into pixels
+   - Each pixel has a number (0 = black, 255 = white)
+   - These numbers are fed into the network
 
-  [Pixel 1] ──┐
-  [Pixel 2] ──┼──→  [Neuron A] ──┐
-  [Pixel 3] ──┼──→  [Neuron B] ──┼──→  [Cat: 92%]
-  [Pixel 4] ──┼──→  [Neuron C] ──┘     [Dog:  8%]
-  [Pixel 5] ──┘
+2. HIDDEN LAYER (the "thinking" happens here)
+   - Each neuron looks at the inputs and asks a different question:
+     - Neuron A: "Are there pointy shapes in the top part?" → score: 0.87
+     - Neuron B: "Is there a long shape in the middle?"     → score: 0.12
+     - Neuron C: "Are there thin lines near the nose?"      → score: 0.91
 
-  Each arrow has a "weight" (a number).
-  Training adjusts these weights until the output is correct.
+3. OUTPUT LAYER (the final decision)
+   - Combines all neuron scores:
+     - Pointy shapes (0.87) + thin lines (0.91) = strong cat signals
+     - Long shape (0.12) = weak dog signal
+     - Final answer: Cat 92%, Dog 8%
 ```
 
-**Real-World Analogy:**
+**The "weights" on the arrows — what are they?**
+```
+Think of weights as IMPORTANCE MULTIPLIERS:
 
-Think of it like a company making a decision:
-- **Input layer** = raw information comes in (sales numbers, customer feedback, market data)
-- **Hidden layers** = middle managers process and summarize the info, each focusing on different aspects
-- **Output layer** = CEO makes the final decision based on what the managers report
+  Pixel 1 ──(weight: 0.9)──→ Neuron A
+  Pixel 2 ──(weight: 0.1)──→ Neuron A
+
+  Weight 0.9 = "this pixel matters A LOT for this neuron's decision"
+  Weight 0.1 = "this pixel barely matters"
+
+  BEFORE training: weights are random → model outputs garbage
+  AFTER training:  weights are tuned  → model outputs correct answers
+
+  Training = adjusting these weights millions of times until the output is right
+```
+
+**Real-World Analogy — The Hiring Committee:**
+```
+  INPUT:     Candidate's resume details (education, experience, skills)
+
+  HIDDEN:    Each committee member weighs things differently:
+             - Member A cares most about experience (high weight on experience)
+             - Member B cares most about education (high weight on degree)
+             - Member C cares most about skills (high weight on certifications)
+
+  OUTPUT:    Combined vote → "Hire: 85% confidence"
+
+  The "weights" are how much each member values each factor.
+  "Training" is like the committee learning from past hires —
+  they adjust what they value based on which hires worked out.
+```
+
+**Shallow vs. Deep Neural Networks:**
 
 More layers = model can understand more complex patterns (a "deep" neural network).
 
 ```
 SHALLOW (2-3 layers):              DEEP (50-100+ layers):
-Can learn: "emails with            Can learn: "this email LOOKS
-  CAPS and $$$ = spam"               legitimate but the writing
-                                      style doesn't match the
-Simple patterns only                  sender's previous emails"
-
+Can learn: "house with 4           Can learn: "this house is priced
+  bedrooms and pool =                low for its area, but the nearby
+  expensive"                         construction project will increase
+                                     traffic and reduce value"
+Simple, obvious patterns
                                     Complex, abstract patterns
 ```
 
