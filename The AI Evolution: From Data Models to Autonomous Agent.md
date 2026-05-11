@@ -165,138 +165,152 @@ Model learns to classify     customer segments             lead to winning
 
 Training is the process of showing a model millions of examples until it finds the patterns itself. But before any training starts, there's a full pipeline of work.
 
-### Real-World Example: Building a Spam Email Detector
+### Real-World Example: Predicting House Prices
 
-Let's walk through the entire process of training a model from scratch:
+Let's walk through the entire process of training a model from scratch — we'll build a system that predicts house prices based on property features.
 
 **Step 1: Data Gathering**
 ```
 Sources:
-  - Company email server logs (500,000 emails)
-  - Public spam datasets (Enron dataset, SpamAssassin corpus)
-  - User-reported spam from the last 2 years
+  - Government property records (land registry, municipal data)
+  - Real estate websites (Zillow, Rightmove, 99acres, MagicBricks)
+  - Census data (neighborhood demographics, crime rates)
+  - Geographic data (distance to schools, hospitals, metro stations)
 
-Result: 1 million raw emails collected
+Result: 200,000 property sale records collected (last 5 years)
 ```
 
 **Step 2: Data Preparation & Cleansing**
 ```
 Raw data is MESSY. Before training, you must clean it:
 
-  - Remove duplicates           → 1M emails → 820K unique
-  - Remove corrupted entries    → emails with broken encoding removed
-  - Strip HTML/attachments      → keep only the text content
-  - Remove personal info (PII)  → mask names, phone numbers, addresses
-  - Handle missing fields       → some emails have no subject line
-  - Normalize text              → lowercase, remove extra whitespace
-  - Balance the dataset         → ensure ~50% spam, ~50% not-spam
-                                  (if 90% is spam, model just learns to say "spam" always)
+  - Remove duplicates              → same property listed on 3 websites → keep one
+  - Handle missing values          → 12% of records have no "garage" info
+                                     Option A: fill with median value
+                                     Option B: fill with "unknown" category
+  - Remove outliers                → a ₹500 Cr mansion skews the model
+                                     Remove top/bottom 1% of prices
+  - Fix inconsistent formats       → "3 BHK", "3BHK", "3 Bedroom" → standardize to "3"
+  - Convert currencies/units       → all prices to same currency, area to sq.ft
+  - Remove stale data              → prices from 10 years ago aren't relevant today
+  - Encode categorical data        → "Mumbai" → 1, "Delhi" → 2, "Bangalore" → 3
 
-Result: 700K clean, balanced, labeled emails
+Result: 175,000 clean, consistent property records
 ```
 
 **Step 3: Choosing the Right Algorithm**
 
 | Algorithm | Best When | Trade-off |
 |-----------|-----------|-----------|
-| **Logistic Regression** | Simple problems, explainability needed | Fast but limited — can't learn complex patterns |
-| **Random Forest** | Tabular data, medium complexity | Good accuracy, slower on large data |
-| **Neural Network** | Complex patterns, large datasets | High accuracy but needs lots of data and compute |
-| **BERT (fine-tuned)** | Understanding language context matters | Best accuracy for text, expensive to train |
+| **Linear Regression** | Simple relationships (price goes up linearly with size) | Fast, explainable, but misses complex patterns |
+| **Random Forest** | Tabular data with many features interacting | Good accuracy, handles non-linear patterns |
+| **Gradient Boosting (XGBoost)** | Structured data, competitions, high accuracy needed | Best accuracy for tabular data, slower to train |
+| **Neural Network** | Very large datasets, complex non-linear relationships | Needs lots of data, harder to interpret |
 
-For our spam detector: **We choose a fine-tuned BERT** because email spam requires understanding context — "Your account will be closed" could be legitimate (from your bank) or spam (phishing).
+For our house price predictor: **We choose Gradient Boosting (XGBoost)** because property pricing has complex non-linear relationships — a 3rd bedroom adds more value in a suburb than in a city studio apartment. XGBoost handles these interactions well with structured data.
 
-**Step 4: Feature Engineering / Tokenization**
+**Step 4: Feature Engineering**
 ```
-How you represent data depends on the algorithm you chose:
+Turn raw property data into meaningful numbers the model can learn from:
 
-FOR TRADITIONAL ML (Logistic Regression, Random Forest):
-  You manually extract features — numbers the model can understand:
+  Raw listing: "3 BHK, 1500 sq.ft, Whitefield Bangalore, 2nd floor, 2018 built, near metro"
 
-  Email: "CONGRATULATIONS! You WON $1,000,000!!! Click HERE now"
+  Features engineered:
+    - Bedrooms                    → 3
+    - Area (sq.ft)                → 1500
+    - Price per sq.ft (nearby)    → ₹6,200 (calculated from neighbor sales)
+    - Floor number                → 2
+    - Total floors in building    → 12
+    - Age of property (years)     → 7
+    - Distance to nearest metro   → 1.2 km
+    - Distance to nearest school  → 0.8 km
+    - Neighborhood avg income     → ₹18L/year
+    - Crime rate (per 1000)       → 2.3
+    - City                        → Bangalore (one-hot encoded)
+    - Month of sale               → March (captures seasonal trends)
 
-  Features extracted:
-    - Word frequency           → "congratulations": 1, "won": 1, "click": 1
-    - ALL CAPS ratio           → 4/9 words = 0.44 (high → spammy)
-    - Exclamation mark count   → 4 (high → spammy)
-    - Contains dollar amounts  → True
-    - Sender in contacts?      → False
-    - Time sent                → 3:42 AM (unusual → spammy)
-
-FOR DEEP LEARNING / BERT:
-  The model handles features itself — you just tokenize (split text into pieces):
-
-  Email: "CONGRATULATIONS! You WON $1,000,000!!! Click HERE now"
-
-  Tokenized: ["CON", "GRATUL", "ATIONS", "!", "You", "WON", "$", "1", ",", "000", ...]
-  Each token → converted to a number (token ID)
-  The model learns WHICH patterns matter on its own — no manual feature work needed.
+  DERIVED FEATURES (combinations that add signal):
+    - Floor ratio                 → 2/12 = 0.17 (higher floors = premium)
+    - Area per bedroom            → 1500/3 = 500 sq.ft (spaciousness)
+    - Metro accessibility score   → 1/1.2 = 0.83 (closer = higher score)
 ```
 
-> This is a key advantage of deep learning: traditional ML requires humans to decide what features matter. Deep learning figures it out itself.
+> Feature engineering is where domain knowledge matters most. A data scientist who understands real estate knows that "distance to metro" matters more in cities than in suburbs — and encodes that knowledge into features.
 
 **Step 5: Train / Test Split**
 ```
-700K emails split:
-  - Training set:   560K (80%) → model learns from these
-  - Validation set:  70K (10%) → tune hyperparameters during training
-  - Test set:        70K (10%) → final evaluation (model NEVER sees these during training)
+175,000 records split:
+  - Training set:   140,000 (80%) → model learns from these
+  - Validation set:  17,500 (10%) → tune hyperparameters
+  - Test set:        17,500 (10%) → final evaluation (model NEVER sees these during training)
 
 Why separate test set?
   Like a final exam with questions the student has never seen.
   If you test on training data, you're just checking memorization, not understanding.
+
+IMPORTANT: Split by TIME, not randomly!
+  Training:   2019-2022 sales
+  Validation: 2023 sales
+  Test:       2024 sales
+  (Because in production, you always predict FUTURE prices from PAST data)
 ```
 
 **Step 6: Training (The Loop)**
 ```
-Feed training emails through the model:
-  Epoch 1:  Accuracy 62% (barely better than guessing)
-  Epoch 5:  Accuracy 78% (learning obvious spam words)
-  Epoch 15: Accuracy 91% (understanding context)
-  Epoch 30: Accuracy 96% (catching subtle phishing)
-  Epoch 50: Accuracy 96.2% (diminishing returns → stop here)
+Feed training data through the model:
+  Round 1:    Avg error: ₹32L  (wildly off — model is guessing)
+  Round 50:   Avg error: ₹14L  (learning that location matters most)
+  Round 200:  Avg error: ₹6.2L (understanding size + location + age interactions)
+  Round 500:  Avg error: ₹4.1L (capturing subtle patterns like floor premium)
+  Round 800:  Avg error: ₹3.9L (diminishing returns → stop here)
 ```
 
 **Step 7: Hyperparameter Tuning**
 ```
 The model has settings (hyperparameters) that affect how well it learns:
 
-  - Learning rate:  0.001 → tried 0.0001 → better! (smoother learning)
-  - Batch size:     32 → tried 64 → slightly faster, same accuracy
-  - Epochs:         50 → after 35, no improvement → stop at 35 (prevents overfitting)
-  - Dropout:        0.1 → tried 0.3 → reduces overfitting on small classes
+  - Max depth:        6 → tried 8 → slightly better but overfits
+  - Learning rate:    0.1 → tried 0.01 → more stable, needs more rounds
+  - Num estimators:   800 → tried 1200 → no improvement after 800
+  - Min samples/leaf: 5 → tried 20 → better generalization on rare property types
 
 Use the VALIDATION set to compare experiments:
-  Experiment 1 (lr=0.001):  Val accuracy 95.8%
-  Experiment 2 (lr=0.0001): Val accuracy 97.1%  ← winner
-  Experiment 3 (lr=0.01):   Val accuracy 88.3%  ← too aggressive
+  Experiment 1 (depth=6, lr=0.1):    Val error ₹4.3L
+  Experiment 2 (depth=8, lr=0.01):   Val error ₹3.8L  ← winner
+  Experiment 3 (depth=10, lr=0.1):   Val error ₹5.1L  ← overfitting
 
 Pick the best hyperparameters, then do final evaluation.
 ```
 
 **Step 8: Evaluation on Test Set**
 ```
-Run the 70K unseen test emails (NEVER used during training or tuning):
+Run the 17,500 unseen 2024 property records:
 
-                    Predicted Spam    Predicted Not-Spam
-  Actual Spam          33,800              1,200        ← 1,200 spam got through (bad)
-  Actual Not-Spam         500             34,500        ← 500 legit emails blocked (annoying)
+  Mean Absolute Error (MAE):     ₹4.2L
+    → On average, predictions are off by ₹4.2 lakhs
 
-  Accuracy: 97.6%
-  Precision: 98.5% (when it says spam, it's almost always right)
-  Recall: 96.6% (catches 96.6% of all spam)
-  F1 Score: 97.5% (balance between precision and recall)
+  Median Absolute Error:         ₹2.8L
+    → Half of predictions are within ₹2.8L (a few expensive outliers raise the mean)
+
+  R² Score:                      0.91
+    → Model explains 91% of price variation (excellent)
+
+  Error by price range:
+    Budget (< ₹50L):            Avg error ₹2.1L (5% off)  ✓ Good
+    Mid-range (₹50L - ₹1.5Cr): Avg error ₹5.8L (5% off)  ✓ Good
+    Luxury (> ₹1.5Cr):         Avg error ₹18L  (8% off)   ⚠ Harder — luxury is unpredictable
 ```
 
 **Step 9: Deploy & Monitor**
 ```
-Model goes live → scans incoming emails in real-time
+Model goes live → real estate app shows predicted price for any listing
 But the job isn't done:
-  - Spammers adapt → new tactics appear monthly
+  - Market conditions change     → interest rate hikes crash prices
+  - New infrastructure (metro line) changes neighborhood values overnight
   - Model accuracy drifts over time (called "model drift")
-  - Monitor key metrics in production (latency, accuracy, false positives)
-  - Solution: retrain periodically with fresh data + new spam examples
-  - Set alerts: if accuracy drops below 95%, trigger retraining pipeline
+  - Monitor: track predicted vs. actual sale prices weekly
+  - Set alerts: if MAE rises above ₹6L, trigger retraining
+  - Retrain quarterly with latest sales data
 ```
 
 > This is the full ML lifecycle. Every AI system — whether it detects spam, diagnoses disease, or recommends movies — follows these same steps. The scale changes, the fundamentals don't.
