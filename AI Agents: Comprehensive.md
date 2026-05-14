@@ -1,4 +1,10 @@
-# AI Agents: Comprehensive Session Guide
+# AI Agents: From LLMs to Autonomous Multi-Agent Systems
+
+---
+
+## Executive Summary
+
+AI Agents represent the next evolution beyond chatbots and standalone LLMs. They combine large language models with tools, memory, and autonomous decision-making to plan and execute multi-step tasks with minimal human intervention. This guide covers the full spectrum — from core concepts to architecture patterns, practical building blocks, real-world applications, and the challenges that remain unsolved. Whether you're evaluating agents for your organization, building them, or leading teams that will use them, this session equips you with the mental models to make informed decisions.
 
 ---
 
@@ -30,7 +36,7 @@ LLMs as Conversational AI (2022-2023)
 LLMs with Tool Use (2023-2024)
     │
     ▼
-Autonomous AI Agents (2024-2026)
+Increasingly Autonomous AI Agents (2024-2026)
     │
     ▼
 Multi-Agent Systems (2025+)
@@ -47,7 +53,7 @@ Multi-Agent Systems (2025+)
 |--------|----------|
 | **Chatbot** | "I don't have real-time data. Please check a financial website." |
 | **LLM** | "As of my last training data, Tesla was trading around $X..." (possibly outdated) |
-| **Agent** | Calls stock API → gets real-time price → "Tesla is currently trading at $247.32, up 2.3% today." |
+| **Agent** | Calls stock API → gets real-time price → "Tesla is currently trading at $X.XX, up Y% today." *(illustrative example)* |
 
 ---
 
@@ -510,6 +516,8 @@ class AgentMemory:
 
 ### Retrieval-Augmented Generation (RAG) in Agents
 
+> **Builds on:** Section 1 (Tool Use) — RAG is a specialized tool pattern. This section focuses on what's unique about RAG when used *inside* an agentic loop.
+
 #### Why RAG?
 
 LLMs have a knowledge cutoff and can't know your private data. RAG bridges this gap:
@@ -686,6 +694,8 @@ Week 4: Fully autonomous for this task type
 ---
 
 ### Agent-to-Agent Communication
+
+> **Builds on:** Section 2 (Router/Orchestrator Patterns) — this section dives deeper into *how* agents communicate within those architectures.
 
 #### Communication Patterns
 
@@ -1009,15 +1019,15 @@ Domain expert has final say in their domain
 └─────────────────────────────────────────────────────────────┘
 ```
 
-#### Metrics That Matter
+#### Metrics That Matter *(illustrative ranges — actual results vary by implementation)*
 
-| Metric | Without Agent | With Agent |
+| Metric | Without Agent | With Agent (typical range) |
 |--------|--------------|-----------|
-| First response time | 4 hours | < 30 seconds |
-| Resolution rate (auto) | 0% | 40-60% |
-| Human agent load | 100% | 40-60% |
-| Customer satisfaction | Baseline | +15-25% |
-| Cost per ticket | $15-25 | $2-5 |
+| First response time | Hours | Seconds |
+| Resolution rate (auto) | 0% | 30-60% |
+| Human agent load | 100% | 40-70% |
+| Customer satisfaction | Baseline | Improved |
+| Cost per ticket | Higher | Significantly lower |
 
 ---
 
@@ -1196,16 +1206,16 @@ Agent corrects: "The company was founded in 2013"
 
 ### Cost and Latency Management
 
-#### The Cost Equation
+#### The Cost Equation *(illustrative — actual pricing varies by provider and changes frequently)*
 
 ```
 Total Cost = (Input tokens × price) + (Output tokens × price) × Number of steps
            + Tool call costs + Infrastructure
 
-Example:
-  Simple query: 1 LLM call = $0.01
-  Agent task: 15 LLM calls + 8 tool calls = $0.50-$2.00
-  Complex workflow: 50+ LLM calls = $5.00-$20.00
+Approximate order of magnitude:
+  Simple query: 1 LLM call → cents
+  Agent task: 10-20 LLM calls + tool calls → low single-digit dollars
+  Complex workflow: 50+ LLM calls → $5-$20+
 ```
 
 #### Optimization Strategies
@@ -1219,7 +1229,7 @@ Example:
 | **Parallel execution** | Latency only | Same cost, faster results |
 | **Batch processing** | 50% | Higher latency |
 
-#### Model Routing Example
+#### Model Routing Example *(pricing illustrative — check current rates)*
 
 ```
 ┌──────────────┐
@@ -1230,9 +1240,9 @@ Example:
 │ Complexity check  │
 └──────┬───────────┘
        │
-       ├── Simple → Haiku ($0.001/call)    — "What time is it in London?"
-       ├── Medium → Sonnet ($0.01/call)    — "Summarize this document"
-       └── Complex → Opus ($0.05/call)     — "Design a system architecture"
+       ├── Simple → Smaller/faster model   — "What time is it in London?"
+       ├── Medium → Mid-tier model         — "Summarize this document"
+       └── Complex → Most capable model    — "Design a system architecture"
 ```
 
 #### Latency Breakdown
@@ -1486,7 +1496,42 @@ def run_debate(topic, rounds=3):
 
 ---
 
-## Appendix: Frameworks and Tools Reference
+## Key Takeaways
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                     │
+│  1. AGENTS = LLM + TOOLS + LOOP + MEMORY                           │
+│     They plan, act, observe, and iterate autonomously.              │
+│                                                                     │
+│  2. PATTERN SELECTION MATTERS                                       │
+│     Single-agent for focused tasks, multi-agent for complexity,     │
+│     human-in-the-loop for high-stakes decisions.                    │
+│                                                                     │
+│  3. GUARDRAILS ARE NON-NEGOTIABLE                                   │
+│     Tool access control, cost limits, confidence thresholds,        │
+│     and human checkpoints prevent runaway behavior.                 │
+│                                                                     │
+│  4. NOT EVERYTHING NEEDS AN AGENT                                   │
+│     Use the decision matrix: if it's deterministic, time-critical,  │
+│     or zero-tolerance — use simpler automation.                     │
+│                                                                     │
+│  5. WE'RE STILL EARLY                                               │
+│     Evaluation, cost management, and error propagation are          │
+│     active research areas. Build with iteration in mind.            │
+│                                                                     │
+│  6. START SMALL, EXPAND AUTONOMY GRADUALLY                          │
+│     Begin with human-in-the-loop, earn trust, then increase         │
+│     agent independence as confidence grows.                         │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Appendix A: Frameworks and Tools Reference
+
+> **Note:** The AI agent ecosystem evolves rapidly. Verify framework names, features, and availability before adopting. The entries below reflect the landscape as of early 2026.
 
 | Framework | Language | Best For | Key Feature |
 |-----------|----------|----------|-------------|
@@ -1500,7 +1545,7 @@ def run_debate(topic, rounds=3):
 
 ---
 
-## Appendix: Glossary
+## Appendix B: Glossary
 
 | Term | Definition |
 |------|-----------|
@@ -1516,6 +1561,14 @@ def run_debate(topic, rounds=3):
 | **Context window** | The maximum amount of text an LLM can process at once |
 | **Function calling** | The ability for an LLM to request execution of defined functions |
 | **Agentic loop** | The iterative cycle of reasoning and acting until a goal is met |
+
+---
+
+---
+
+## Appendix C: Disclaimer
+
+> All examples, metrics, cost figures, and framework references in this guide are **illustrative** unless explicitly noted as verified. The AI agent landscape changes rapidly — always verify claims, pricing, and capabilities against current documentation before making decisions.
 
 ---
 
